@@ -1,17 +1,12 @@
 import sqlite3
 import re
 import csv
+from pub import kws  #导入关键词列表
 
 database = sqlite3.connect('search.db')
 db = database.cursor()
 
 db.execute('''select KEYWORD from SEARCH;''')
-
-kws = []  # 关键词列表
-for item in db.fetchall():
-    kws.append(list(item)[0])
-
-kws = list(set(kws))
 
 # 提前建好CSV得分文件
 csvFile = open('score_search.csv', 'w+', newline='') #newline用来避免空行
