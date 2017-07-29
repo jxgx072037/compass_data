@@ -1,14 +1,40 @@
-$def with (data, kws)
+$def with (data, kws, date, count, search_word)
 
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=gbk">
+    <meta http-equiv="Content-Type" content="text/html; charset=gbk">
+    <h3>分期乐搜索关键词分数排行，日期：$date[:-9]</h3>
 </head>
-
-<h1>分期乐搜索关键词分数</h1>
 
 <hr/>
 
-<ol>
-$for item in data:
-    <li>$item</li>
-</ol>
+<body>
+    <p>
+        <form id = 'search' action="/" method = 'post'>
+            <input type = 'text' name = 'keyword' placeholder="请输入关键词"/>
+            <input type = 'submit' value="查询"/>
+        </form>
+    </p>
+
+    $if count>0:
+        <p>
+            <i>注：搜索排序分数越低，排序质量约高</i>
+        </p>
+        <p>共查询到 $count 条记录</p>
+        <table cellpadding="2">
+            <thead>
+                <tr>
+                    <td><b>关键词</b></td>
+                    <td><b>搜索结果的点击次数</b></td>
+                    <td><b>搜索结果排序分数</b></td>
+                </tr>
+            </thead>
+        $for item in data:
+            <tr>
+                <td>$dict(item)['KEYWORD']</td>
+                <td>$dict(item)['SEARCH_NUM']</td>
+                <td>$dict(item)['KW_SCORE']</td>
+            <tr>
+        </table>
+    $else:
+        <p>太丧了，没查到记录……当天分期乐App上没有用户搜"$dict(search_word)['keyword']"这个词 = =</p>
+</body>

@@ -2,16 +2,32 @@ import sqlite3
 import re
 import csv
 from pub import kws  #导入关键词列表
+from pub import date
+import time
+
+time_start = time.time()
 
 database = sqlite3.connect('search.db')
 db = database.cursor()
 
+db.execute('''DROP TABLE SEARCH_KW;''')
+db.execute('''
+            CREATE TABLE IF NOT EXISTS SEARCH_KW
+            (
+                ID INT PRIMARY KEY NOT NULL,
+                DATE TEXT NOT NULL,
+                KEYWORD TEXT NOT NULL,
+                SEARCH_NUM INT NOT NULL,
+                KW_SCORE INT NOT NULL
+            );
+            ''')
 db.execute('''select KEYWORD from SEARCH;''')
 
 # 提前建好CSV得分文件
-csvFile = open('score_search.csv', 'w+', newline='') #newline用来避免空行
-writer = csv.writer(csvFile)
-writer.writerow(('keyword', 'search_num', 'score'))
+# csvFile = open('score_search.csv', 'w+', newline='') #newline用来避免空行
+# writer = csv.writer(csvFile)
+# writer.writerow(('keyword', 'search_num', 'score'))
+
 
 #整理每一条搜索关键字数据，增加两个排序参数（按搜索次数和位置）
 
@@ -69,7 +85,10 @@ for kw in kws:
         try:
             kw_score.append(kw)
             kw_score += item_score(data_kw)
-            writer.writerow(kw_score)
+            # writer.writerow(kw_score) #写CSV文件
+
+            db.execute('''INSERT INTO SEARCH_KW (ID, DATE, KEYWORD, SEARCH_NUM, KW_SCORE) VALUES (?,?,?,?,?);''',(num, date, kw_score[0], kw_score[1], kw_score[2]))
+
         except UnicodeEncodeError:
             print (UnicodeEncodeError)
 
@@ -81,11 +100,13 @@ for kw in kws:
     # if num >=200:
     #     break
 
-csvFile.close()
+# csvFile.close()
 database.commit()
 database.close()
 
-print ("计算完毕")
+time_end = time.time()
+time = time_end-time_start
+print ("计算完毕, 共耗时%.2f"%(time)+"s")
 
 
 
